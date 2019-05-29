@@ -62,7 +62,7 @@ class MigrationImportWordpress(models.Model):
             media_attachment.name = filename
         else:
             #Download the image and creat a public attachment
-            image_data = base64.b64encode( requests.get(url).content )
+            image_data = base64.b64encode( requests.get(url, allow_redirects=False).content )
             media_attachment = self.env['ir.attachment'].create({'name':filename, 'type':'binary', 'datas':image_data, 'datas_fname': filename, 'res_model': 'ir.ui.view', 'public': True})
 
             #We need to keep track of any imported media
@@ -75,7 +75,7 @@ class MigrationImportWordpress(models.Model):
     def pagination_requests(self, url):
         """Repeats the request multiple time until it has all pages"""
 
-        response_string = requests.get(url + "?per_page=100&page=1")
+        response_string = requests.get(url + "?per_page=100&page=1", allow_redirects=False)
         combined_json_data = json.loads(response_string.text)
 
         if "X-WP-TotalPages" in response_string.headers:
@@ -83,7 +83,7 @@ class MigrationImportWordpress(models.Model):
 
             if total_pages > 1:
                 for page in range(2, total_pages + 1 ):
-                    response_string = requests.get(url + "?per_page=100&page=" + str(page) )
+                    response_string = requests.get(url + "?per_page=100&page=" + str(page), allow_redirects=False)
                     combined_json_data = combined_json_data + json.loads(response_string.text)
 
         return combined_json_data
