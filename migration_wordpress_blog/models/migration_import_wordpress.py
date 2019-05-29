@@ -24,7 +24,7 @@ class MigrationImportWordpressBlog(models.Model):
         media_json_data = self.pagination_requests(self.wordpress_url + "/wp-json/wp/v2/media")
 
         #Get Posts
-        tax_response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/posts")
+        tax_response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/posts", allow_redirects=False)
         tax_json_data = json.loads(tax_response_string.text)
 
         for blog_json in blog_json_data:
@@ -39,7 +39,7 @@ class MigrationImportWordpressBlog(models.Model):
 
             featured_image = False
             if feature_media_id != "0":
-                response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/media/" +  str(feature_media_id) )
+                response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/media/" +  str(feature_media_id), allow_redirects=False)
                 featured_image_json_data = json.loads(response_string.text)
                 featured_image = self.transfer_media( featured_image_json_data )
 
@@ -70,7 +70,7 @@ class MigrationImportWordpressBlog(models.Model):
                 wordpress_user = self.env['ir.model.data'].xmlid_to_object('wordpress_import.import_user_' + str(blog_json['author']) )
 
                 if wordpress_user is None:
-                    user_response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/users/" + str(blog_json['author']) )
+                    user_response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/users/" + str(blog_json['author']), allow_redirects=False)
                     user_json = json.loads(user_response_string.text)
                     wordpress_user = self.transfer_user(user_json)
 
